@@ -7,18 +7,18 @@
   "dependencies": {
     "@emotion/core": "10.0.7",
     "@emotion/styled": "10.0.7",
-    "@types/react": "16.8.7",
-    "@types/react-dom": "16.8.2",
-    "@types/superagent": "4.1.0",
+    "@types/react": "16.7.22",
+    "@types/react-dom": "16.0.11",
+    "@types/superagent": "^4.1.0",
     "react": "16.5.2",
     "react-dom": "16.5.2",
-    "react-scripts": "2.0.3",
-    "superagent": "4.1.0"
+    "react-scripts": "^2.1.8",
+    "superagent": "^4.1.0",
+    "typescript": "^3.3.3333"
   },
   "devDependencies": {
     "@types/react": "16.7.22",
-    "@types/react-dom": "16.0.11",
-    "@types/superagent": "4.1.0"
+    "@types/react-dom": "16.0.11"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -26,5 +26,10 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"]
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

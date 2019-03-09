@@ -2,6 +2,8 @@ import * as React from 'react'
 import styled from '@emotion/styled'
 import request from 'superagent'
 
+const url = 'http://localhost:3001'
+
 const Wrapper = styled.div`
   background-color: #f5f5f5;
   padding: 40px;
@@ -24,7 +26,8 @@ const TodosListItem = styled.li`
 `
 
 const TodoItem = styled.div`
-  text-decoration: ${props => (props.complete ? 'line-through' : 'initial')};
+  text-decoration: ${(props: { complete: boolean }) =>
+    props.complete ? 'line-through' : 'initial'};
   width: 200px;
   display: inline-block;
   vertical-align: middle;
@@ -99,67 +102,68 @@ interface ITodoListProps {}
 interface ITodoListState {
   todos: ITodo[]
   value: string
-  index: number
   loadingData: boolean
 }
 
 class TodoList extends React.Component {
-  constructor(props) {
+  constructor(props: ITodoListProps) {
     super(props)
     this.state = {
       todos: [],
       value: '',
-      index: 0,
       loadingData: true
     }
   }
 
-  props: ITodoListProps
   state: ITodoListState
 
   componentDidMount() {
-    console.log('fetching')
-    this.fetchData()
+    this.getTodos()
   }
 
-  fetchData = async () => {
-    console.log('request')
+  getTodos = async () => {
     try {
-      const response = await request.get('localhost:3000/all')
-      console.log('response', response)
+      const { body } = await request.get(url)
+      console.log('body', body)
+      if (body.success && body.todos) {
+        this.setState({ todos: body.todos })
+      }
     } catch (e) {
-      console.log('fetch error', e)
+      return
     }
   }
 
-  changeVal = val => this.setState(prevState => ({ value: val }))
+  changeVal = (val: string) => this.setState(prevState => ({ value: val }))
 
-  submitTodo = () => {
-    if (this.state.value === '') return
-    const newTodos = [...this.state.todos]
-    const todo = {
-      title: this.state.value,
-      complete: false,
-      index: this.state.index
+  submitTodo = async () => {
+    try {
+      const todo = {
+        title: this.state.value,
+        complete: false
+      }
+      await request
+        .post(url)
+        .set('Content-Type', 'application/json')
+        .send(todo)
+      await this.getTodos()
+      return
+    } catch (e) {
+      console.log('submitError', e)
+      return
     }
-    const newIndex = this.state.index + 1
-    newTodos.push(todo)
-    this.setState(prevState => ({
-      todos: newTodos,
-      value: '',
-      index: newIndex
-    }))
-    return
   }
 
   toggleTodo = (index: number) => {
     const oldTodo = this.state.todos.find(todo => todo.index === index)
-    oldTodo.complete = !oldTodo.complete
+    if (oldTodo && oldTodo.hasOwnProperty('complete')) {
+      oldTodo.complete = !oldTodo.complete
+    }
+
     const newTodos = this.state.todos.filter(el => {
       return el.index !== index
     })
-    newTodos.unshift(oldTodo)
-    this.setState(prevState => ({ todos: newTodos }))
+    newTodos.unshift(oldTodo as ITodo)
+    this.setState({ todos: newTodos })
     return
   }
 

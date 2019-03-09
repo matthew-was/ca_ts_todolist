@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 
-import TodoList from './todoList.tsx'
+import TodoList from './todoList'
 
 import './styles.css'
 
