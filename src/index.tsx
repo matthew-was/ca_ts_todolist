@@ -1,14 +1,17 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 
-import TodoList from './todoList'
+import { TodoList } from './TodoList/todoList'
+import { TodoPresenter } from './TodoList/presenter'
+
+const todoPresenter: TodoPresenter = new TodoPresenter()
 
 import './styles.css'
 
 function App() {
   return (
     <div className="App">
-      <TodoList />
+      <TodoList presenter={todoPresenter} />
     </div>
   )
 }
