@@ -1,6 +1,7 @@
 import { observable, action } from 'mobx'
-import request from 'superagent'
 import moment from 'moment'
+
+import { todoGateway } from './gateway'
 
 interface ITodo {
   title: string
@@ -8,8 +9,6 @@ interface ITodo {
   id: number
   created: string
 }
-
-const url = 'http://localhost:3001'
 
 export class TodoPresenter {
   constructor() {
@@ -30,7 +29,7 @@ export class TodoPresenter {
   @action
   public getTodos = async () => {
     try {
-      const { body } = await request.get(url)
+      const body = await todoGateway.get()
       if (body.success && body.todos) {
         const newTodos: ITodo[] = body.todos.map((todo: ITodo) => {
           return {
@@ -52,10 +51,7 @@ export class TodoPresenter {
         title: this.value,
         complete: false
       }
-      await request
-        .post(url)
-        .set('Content-Type', 'application/json')
-        .send(todo)
+      await todoGateway.post(todo)
       this.value = ''
       await this.getTodos()
       return
@@ -68,16 +64,14 @@ export class TodoPresenter {
   public toggleTodo = async (index: number) => {
     try {
       const oldTodo = this.todos.find(todo => todo.id === index)
-      let newTodo = {}
+      let newTodo: { id: number; complete: boolean; title: string }
       if (oldTodo && oldTodo.hasOwnProperty('complete')) {
-        newTodo = { ...oldTodo, complete: !oldTodo.complete }
+        const { id, complete, title } = oldTodo
+        newTodo = { id, title, complete: !complete }
       } else {
         return
       }
-      await request
-        .put(url)
-        .set('Content-Type', 'application/json')
-        .send(newTodo)
+      await todoGateway.put(newTodo)
       await this.getTodos()
       return
     } catch (e) {
@@ -88,7 +82,7 @@ export class TodoPresenter {
   @action
   public deleteTodo = async (index: number) => {
     try {
-      await request.del(`${url}/${index}`)
+      await todoGateway.delete(index)
       await this.getTodos()
       return
     } catch (e) {
